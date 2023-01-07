@@ -1,0 +1,83 @@
+body {
+    background-color:black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: monospace;
+}
+
+canvas {
+    position:absolute;
+    margin:0;
+    padding:0;
+    background-color: rgb(165, 85, 85);
+}
+
+#debug:disabled {
+    position:absolute;
+    z-index:2;
+    bottom:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    background-color: black;
+    font-size: 3vmin;
+    padding:2vmin;
+    color:rgb(38, 85, 255);
+    font-family: monospace;
+    -webkit-text-fill-color:rgb(38, 85, 255);
+    opacity: 1;
+    resize:none;
+}
+
+#debug::selection {
+    background:rgb(38, 85, 255);
+    color: black;
+}
+
+#debugInfo {
+    position:absolute;
+    top:2vmin;
+    right:8vmin;
+    background-color: black;
+    border: solid;
+    border-color: rgb(38, 85, 255);
+    width:20vw;
+    height:20vh;
+    z-index: 3;
+    color: rgb(38, 85, 255);
+    padding-left:2vmin;
+    font-size: 2vmin;
+    line-height: 1vmin;
+}
+
+#statHead {
+    text-decoration: underline;
+}
+
+#close {
+    z-index: 3;
+    position: absolute;
+    top:2vmin;
+    right:2vmin;
+    width:4vmin;
+    height:4vmin;
+    background-color: black;
+    border:solid;
+    border-color: rgb(38, 85, 255);
+    color: rgb(38, 85, 255);
+    font-family: monospace;
+    font-size: 2vmin;
+    transition: 0.2s;
+}
+#close:hover {
+    background-color: rgb(38, 85, 255);
+    color:black;
+}
+#close:active {
+    background-color: black;
+}
+
+#debugInfo {
+    transition:0.2s;
+}

@@ -1,0 +1,19 @@
+<head>
+    <title>Bokk</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body onresize="resized()">
+    <canvas id="canvas"></canvas>
+    <textarea id="debug" disabled hidden></textarea>
+    <div id="debugInfo" hidden>
+        <p id="statHead">Stats</p>
+        <stat id="debug_framerate"></stat>
+    </div>
+    <button id="close" onclick="closeDebug(this)">O</button>
+</body>
+
+<script src="js/debug.js"></script>
+<script src="js/events.js"></script>
+<script src="js/systems.js"></script>
+<script src="script.js"></script>
+<script src="js/runtime.js"></script>
