@@ -13,5 +13,5 @@ class Api:
 
 # Open website
 api = Api()
-window = webview.create_window('Mysterious Mind', 'index.html', js_api = api)
+window = webview.create_window('Bokk', 'index.html', js_api = api)
 webview.start()

@@ -33,7 +33,7 @@ function printing() {
     }
 }
 
-statPrefix = {"framerate": "FPS: "}
+statPrefix = {"framerate": "FPS: ", "faces":"# of Faces: "}
 function updateStat(stat, value) {
     document.getElementById("debug_" + stat).innerText = statPrefix[stat] + value
 }

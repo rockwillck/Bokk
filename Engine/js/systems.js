@@ -42,10 +42,13 @@ function fillPixelText(text, x, y) {
 }
 
 function distance(point1, point2) {
-    return Math.sqrt((point1.x - point2.x)**2 + (point1.y - point2.y)**2)
+    point1 = point1.position
+    point2 = point2.position
+    return typeof point1.z != "undefined" ? Math.sqrt((point1.x - point2.x)**2 + (point1.y - point2.y)**2 + (point1.z - point2.z)**2) : Math.sqrt((point1.x - point2.x)**2 + (point1.y - point2.y)**2)
 }
 
 function normalize(xy) {
+    xy = xy.position
     x = xy.x
     y = xy.y
     return x == 0 && y == 0 ? {x:0,y:0} : {x:x/Math.sqrt(x**2 + y**2), y:y/Math.sqrt(x**2 + y**2)}
