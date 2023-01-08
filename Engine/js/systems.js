@@ -1,4 +1,4 @@
-var viewport = {width:1024, height:1024}
+var viewport = {width:1536, height:1024}
 var canvas = document.getElementById("canvas")
 var ctx = canvas.getContext("2d")
 canvas.width = viewport.width

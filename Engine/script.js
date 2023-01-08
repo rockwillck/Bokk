@@ -208,7 +208,7 @@ function F(vertices, color) {
     return new Face(vertices, color)
 }
 
-function generateSphere(center, radius, horizResolution, vertResolution) {
+function generateSphere(center, radius, horizResolution, vertResolution, color="white") {
     var sphere = new Prop([])
     var r = radius
 
@@ -233,7 +233,7 @@ function generateSphere(center, radius, horizResolution, vertResolution) {
             phiRad = phi * Math.PI/180
             thetaRad2 = theta2 * Math.PI/180
             phiRad2 = phi2 * Math.PI/180
-            sphere.faces.push(new Face([new Cartesian3D(r*Math.sin(phiRad)*Math.cos(thetaRad) + center.position.x, r*Math.sin(phiRad)*Math.sin(thetaRad) + center.position.y, r*Math.cos(phiRad) + center.position.z), C3D(r*Math.sin(phiRad2)*Math.cos(thetaRad) + center.position.x, r*Math.sin(phiRad2)*Math.sin(thetaRad) + center.position.y, r*Math.cos(phiRad2) + center.position.z), C3D(r*Math.sin(phiRad2)*Math.cos(thetaRad2) + center.position.x, r*Math.sin(phiRad2)*Math.sin(thetaRad2) + center.position.y, r*Math.cos(phiRad2) + center.position.z), C3D(r*Math.sin(phiRad)*Math.cos(thetaRad2) + center.position.x, r*Math.sin(phiRad)*Math.sin(thetaRad2) + center.position.y, r*Math.cos(phiRad) + center.position.z)]))
+            sphere.faces.push(new Face([new Cartesian3D(r*Math.sin(phiRad)*Math.cos(thetaRad) + center.position.x, r*Math.sin(phiRad)*Math.sin(thetaRad) + center.position.y, r*Math.cos(phiRad) + center.position.z), C3D(r*Math.sin(phiRad2)*Math.cos(thetaRad) + center.position.x, r*Math.sin(phiRad2)*Math.sin(thetaRad) + center.position.y, r*Math.cos(phiRad2) + center.position.z), C3D(r*Math.sin(phiRad2)*Math.cos(thetaRad2) + center.position.x, r*Math.sin(phiRad2)*Math.sin(thetaRad2) + center.position.y, r*Math.cos(phiRad2) + center.position.z), C3D(r*Math.sin(phiRad)*Math.cos(thetaRad2) + center.position.x, r*Math.sin(phiRad)*Math.sin(thetaRad2) + center.position.y, r*Math.cos(phiRad) + center.position.z)], color))
         }
     }
 
@@ -270,8 +270,8 @@ function findIntersection(point1, point2, infinitive, planeX, planeY, planeZ, pl
 }
 
 var sphereCamera = new Camera(0, 0, 0, 50)
-var sphereLight = new Light("omni", 10, new Cartesian3D(0, 0, 0), "rgb(100, 100, 50)")
-var sphereScene = new Scene([generateSphere(C3D(0, 0, 0), 10, 25, 25), generateSphere(C3D(15, 0, 0), 2, 15, 15)], sphereCamera, [sphereLight])
+var sphereLight = new Light("omni", 5, new Cartesian3D(0, 0, 0), "white")
+var sphereScene = new Scene([generateSphere(C3D(0, 0, 0), 10, 25, 25, "blue"), generateSphere(C3D(15, 0, 0), 0.5, 15, 15, "blue")], sphereCamera, [sphereLight])
 var velocity = [0, 0, 0]
 var speed = 0.01
 var lightOrbit = 0
