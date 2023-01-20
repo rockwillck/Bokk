@@ -190,6 +190,10 @@ class Light {
             return {mod:(1-distance(this.position, face.mid)/100)*this.brightness, tint:this.tint}
         }
     }
+
+    move(x, y, z) {
+        this.position.move(x, y, z)
+    }
 }
 
 class Prop {
@@ -339,7 +343,7 @@ function findIntersection(point1, point2, infinitive, planeX, planeY, planeZ, pl
 
 var orbitRadius = 50
 var sphereCamera = new Camera(0, 10, 0, 0, 0, 0, 100)
-var sphereLight = new Light("omni", 1, new Cartesian3D(orbitRadius, 10, 0))
+var sphereLight = new Light("omni", 1, new Cartesian3D(0, 0, 0))
 pointerSphere = generateSphere(C3D(0, 17, 0), 15, 15, 15, "red")
 plane = new Prop([])
 for (x=-100;x<=100;x+=4) {
@@ -378,7 +382,7 @@ function runtime() {
     // sphereScene.props[1].move((Math.cos(lightOrbit) * orbitRadius - Math.cos(lightOrbit - 0.02) * orbitRadius)*dt/30, (Math.sin(lightOrbit) * orbitRadius - Math.sin(lightOrbit - 0.02) * orbitRadius)*dt/30, 0)
     
     newPos = [planeLineIntersect(C3D(sphereCamera.position.position.x, -sphereCamera.focalLength + sphereCamera.position.position.y, sphereCamera.position.position.z), C3D(sphereCamera.position.position.x + mousePosition.x - canvas.width/2, sphereCamera.position.position.y, sphereCamera.position.position.z + canvas.height/2 - mousePosition.y), 0, 10, 0, 0, 0, 0).position.x, planeLineIntersect(C3D(sphereCamera.position.position.x, -sphereCamera.focalLength + sphereCamera.position.position.y, sphereCamera.position.position.z), C3D(sphereCamera.position.position.x + mousePosition.x - canvas.width/2, sphereCamera.position.position.y, sphereCamera.position.position.z + canvas.height/2 - mousePosition.y), 0, 10, 0, 0, 0, 0).position.z]
-    pointerSphere.move(-(spherePosition[0] - newPos[0]), 0, -(spherePosition[1] - newPos[1]))
+    sphereLight.move(-(spherePosition[0] - newPos[0]), 0, -(spherePosition[1] - newPos[1]))
     spherePosition = newPos
 
     lightOrbit += 0.02
