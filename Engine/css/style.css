@@ -81,3 +81,8 @@ canvas {
 #debugInfo {
     transition:0.2s;
 }
+
+.debug_stats {
+    height:3vmin;
+    line-height: 2vmin;
+}

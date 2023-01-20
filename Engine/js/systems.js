@@ -44,7 +44,7 @@ function fillPixelText(text, x, y) {
 function distance(point1, point2) {
     point1 = point1.position
     point2 = point2.position
-    return typeof point1.z != "undefined" ? Math.sqrt((point1.x - point2.x)**2 + (point1.y - point2.y)**2 + (point1.z - point2.z)**2) : Math.sqrt((point1.x - point2.x)**2 + (point1.y - point2.y)**2)
+    return typeof point1.y != "undefined" ? Math.sqrt((point1.x - point2.x)**2 + (point1.y - point2.y)**2 + (point1.z - point2.z)**2) : Math.sqrt((point1.x - point2.x)**2 + (point1.z - point2.z)**2)
 }
 
 function normalize(xy) {
