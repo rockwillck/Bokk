@@ -119,6 +119,40 @@ class Cartesian2D {
     }
 }
 
+class Speckle {
+    constructor(x, y, z, color="white") {
+        this.position = new Cartesian3D(x, y, z)
+        this.color = color
+    }
+
+    move(x, y, z) {
+        this.position.move(x, y, z)
+    }
+
+    render(camera, lights) {
+        let renderSpeckle = project(this.position, camera)
+        if (renderSpeckle) {
+            ctx.fillStyle = this.color
+            ctx.fillRect(renderSpeckle.position.x, renderSpeckle.position.z, 1, 1)
+
+            let alpha = 1
+            lights.forEach((light) => {
+                alpha -= light.modifier(this).mod
+            })
+            ctx.save()
+            ctx.globalAlpha = alpha < 0 ? 0 : alpha
+            ctx.fillStyle = "black"
+            ctx.fillRect(renderSpeckle.position.x, renderSpeckle.position.z, 1, 1)
+            ctx.globalAlpha = alpha < 0 ? 1 : alpha > 1 ? 0 : (1-alpha)
+            lights.forEach((light) => {
+                ctx.fillStyle = light.modifier(this).tint
+                ctx.fillRect(renderSpeckle.position.x, renderSpeckle.position.z, 1, 1)
+            })
+            ctx.restore()
+        }
+    }
+}
+
 class Face {
     constructor(vertices, color="gray") {
         this.vertices = vertices
@@ -187,7 +221,7 @@ class Light {
 
     modifier(face) {
         if (this.type == "omni") {
-            return {mod:(1-distance(this.position, face.mid)/100)*this.brightness, tint:this.tint}
+            return {mod:(1-distance(this.position, face.position)/100)*this.brightness, tint:this.tint}
         }
     }
 
@@ -197,13 +231,18 @@ class Light {
 }
 
 class Prop {
-    constructor(faces) {
-        this.faces = faces
+    constructor(speckles) {
+        this.speckles = speckles
+        // this.speckles.forEach((speckle) => {
+        //     if (typeof speckle == Face) {
+                
+        //     }
+        // })
     }
 
     move(x, y, z) {
-        this.faces.forEach((face) => {
-            face.move(x, y, z)
+        this.speckles.forEach((speckle) => {
+            speckle.move(x, y, z)
         })
     }
 }
@@ -234,25 +273,38 @@ function rotatePoint(point, xRot, yRot, zRot) {
     return p
 }
 
+function color(r, g, b, a=1) {
+    return `rgba(${r},${g},${b},${a})`
+}
 
 class Scene {
     constructor(props, camera, lights=[new Light("omni", 0.6, new Cartesian3D(0, 0, 5))]) {
         this.props = props
         this.camera = camera
         this.lights = lights
+        this.screen = []
+        for (let i=0;i<canvas.width;i++) {
+            let screenRow = []
+            for (let k=0;k<canvas.height;k++) {
+                screenRow.push("rgba(0,0,0,1)")
+            }
+            this.screen.push(screenRow)
+        }
+        this.change = []
     }
 
     render() {
-        let faces = []
+        let speckles = []
         this.props.forEach((prop) => {
             // prop.render(this.camera, this.lights)
-            faces = faces.concat(prop.faces)
+            speckles = speckles.concat(prop.speckles)
         })
-        faces.sort((a, b) => {
-            return distance(new Cartesian3D(0, -this.camera.focalLength, 0), b.mid) - distance(new Cartesian3D(0, -this.camera.focalLength, 0), a.mid)
+        speckles.sort((a, b) => {
+            // console.log(a.position, b.position)
+            return distance(new Cartesian3D(0, -this.camera.focalLength, 0), b.position) - distance(new Cartesian3D(0, -this.camera.focalLength, 0), a.position)
         })
-        faces.forEach((face) => {
-            face.render(this.camera, this.lights)
+        speckles.forEach((speckle) => {
+            speckle.render(this.camera, this.lights)
         })
     }
 }
@@ -295,19 +347,44 @@ function generateSphere(center, radius, horizResolution, vertResolution, color="
     // }
     
 
-    for (phi=0;phi<360;phi+=360/vertResolution) {
-        for (theta=0;theta<360;theta+=360/horizResolution) {
+    for (phi=0;phi<360;phi+=1) {
+        for (theta=0;theta<360;theta+=1) {
             theta2 = theta + 360/horizResolution
             phi2 = phi + 360/vertResolution
             thetaRad = theta * Math.PI/180
             phiRad = phi * Math.PI/180
             thetaRad2 = theta2 * Math.PI/180
             phiRad2 = phi2 * Math.PI/180
-            sphere.faces.push(new Face([new Cartesian3D(r*Math.sin(phiRad)*Math.cos(thetaRad) + center.position.x, r*Math.sin(phiRad)*Math.sin(thetaRad) + center.position.y, r*Math.cos(phiRad) + center.position.z), C3D(r*Math.sin(phiRad2)*Math.cos(thetaRad) + center.position.x, r*Math.sin(phiRad2)*Math.sin(thetaRad) + center.position.y, r*Math.cos(phiRad2) + center.position.z), C3D(r*Math.sin(phiRad2)*Math.cos(thetaRad2) + center.position.x, r*Math.sin(phiRad2)*Math.sin(thetaRad2) + center.position.y, r*Math.cos(phiRad2) + center.position.z), C3D(r*Math.sin(phiRad)*Math.cos(thetaRad2) + center.position.x, r*Math.sin(phiRad)*Math.sin(thetaRad2) + center.position.y, r*Math.cos(phiRad) + center.position.z)], color))
+            sphere.speckles.push(new Speckle(r*Math.sin(phiRad)*Math.cos(thetaRad) + center.position.x, r*Math.sin(phiRad)*Math.sin(thetaRad) + center.position.y, r*Math.cos(phiRad) + center.position.z, "white"))
         }
     }
 
     return sphere
+}
+
+function generateCube(x, y, z, width, height, depth) {
+    cube = new Prop([])
+
+    for (i=0;i<width;i+=1) {
+        for (l=0;l<height;l+=1) {
+            cube.speckles.push(new Speckle(x+i, y+l, z))
+            cube.speckles.push(new Speckle(x+i, y+l, z+depth))
+        }
+    }
+    for (i=0;i<width;i+=1) {
+        for (l=0;l<depth;l+=1) {
+            cube.speckles.push(new Speckle(x+i, y, z+l))
+            cube.speckles.push(new Speckle(x+i, y+height, z+l))
+        }
+    }
+    for (i=0;i<depth;i+=1) {
+        for (l=0;l<height;l+=1) {
+            cube.speckles.push(new Speckle(x, y+l, z+i))
+            cube.speckles.push(new Speckle(x+width, y+l, z+i))
+        }
+    }
+
+    return cube
 }
 
 function findIntersection(point1, point2, infinitive, planeX, planeY, planeZ, planeRotationX, planeRotationY, planeRotationZ, planeWidth, planeHeight) {
@@ -344,14 +421,14 @@ function findIntersection(point1, point2, infinitive, planeX, planeY, planeZ, pl
 var orbitRadius = 50
 var sphereCamera = new Camera(0, 10, 0, 0, 0, 0, 100)
 var sphereLight = new Light("omni", 1, new Cartesian3D(0, 0, 0))
-pointerSphere = generateSphere(C3D(0, 17, 0), 15, 15, 15, "red")
-plane = new Prop([])
-for (x=-100;x<=100;x+=4) {
-    for (y=-100;y<=100;y+=4) {
-        plane.faces.push(F([C3D(x, 20, y), C3D(x+4, 20, y), C3D(x+4, 20, y+4), C3D(x, 20, y+4)], "white"))
-    }
-}
-var sphereScene = new Scene([plane, pointerSphere], sphereCamera, [sphereLight])
+pointerSphere = generateSphere(C3D(0, 17, 0), 15, 20, 20, "red")
+// plane = new Prop([])
+// for (x=-100;x<=100;x+=4) {
+//     for (y=-100;y<=100;y+=4) {
+//         plane.speckles.push(F([C3D(x, 20, y), C3D(x+4, 20, y), C3D(x+4, 20, y+4), C3D(x, 20, y+4)], "white"))
+//     }
+// }
+var sphereScene = new Scene([generateCube(0, 0, 0, 50, 50, 50)], sphereCamera, [sphereLight])
 var velocity = [0, 0, 0, 0, 0, 0]
 var speed = 0.01
 var lightOrbit = 0
@@ -368,12 +445,18 @@ function runtime() {
 
     sphereScene.render()
 
-    sphereCamera.position.position.x += velocity[0]*speed*dt
-    sphereCamera.position.position.y += velocity[1]*speed*dt
+    // sphereCamera.position.position.x += velocity[0]*speed*dt
+    // sphereCamera.position.position.y += velocity[1]*speed*dt
     sphereCamera.position.position.z += velocity[2]*speed*dt
 
+    sphereCamera.position.position.y += Math.cos(-sphereCamera.zRot)*velocity[1]*speed*dt + Math.cos(Math.PI/2 - sphereCamera.zRot)*velocity[0]*speed*dt
+    sphereCamera.position.position.x += Math.sin(-sphereCamera.zRot)*velocity[1]*speed*dt + Math.sin(Math.PI/2 - sphereCamera.zRot)*velocity[0]*speed*dt
+    // console.log(Math.cos(sphereCamera.zRot), Math.sin(sphereCamera.zRot)*velocity[0]*speed*dt)
+
+    
+
     updateStat("camera", `(${Math.round(sphereCamera.position.position.x)}, ${Math.round(sphereCamera.position.position.y)}, ${Math.round(sphereCamera.position.position.z)}) // (${Math.round(sphereCamera.xRot*180/Math.PI)}, ${Math.round(sphereCamera.yRot*180/Math.PI)}, ${Math.round(sphereCamera.zRot*180/Math.PI)})`)
-    updateStat("faces", sphereScene.props[0].faces.length)
+    // updateStat("faces", sphereScene.props[0].faces.length)
 
     // console.log(C3D(sphereCamera.position.position.x, -sphereCamera.focalLength + sphereCamera.position.position.y, sphereCamera.position.position.z), C3D(sphereCamera.position.position.x + mousePosition.x, sphereCamera.position.position.y, sphereCamera.position.position.z + mousePosition.y), 0, 10, 0, 0, 0, 0)
 
@@ -381,9 +464,9 @@ function runtime() {
 
     // sphereScene.props[1].move((Math.cos(lightOrbit) * orbitRadius - Math.cos(lightOrbit - 0.02) * orbitRadius)*dt/30, (Math.sin(lightOrbit) * orbitRadius - Math.sin(lightOrbit - 0.02) * orbitRadius)*dt/30, 0)
     
-    newPos = [planeLineIntersect(C3D(sphereCamera.position.position.x, -sphereCamera.focalLength + sphereCamera.position.position.y, sphereCamera.position.position.z), C3D(sphereCamera.position.position.x + mousePosition.x - canvas.width/2, sphereCamera.position.position.y, sphereCamera.position.position.z + canvas.height/2 - mousePosition.y), 0, 10, 0, 0, 0, 0).position.x, planeLineIntersect(C3D(sphereCamera.position.position.x, -sphereCamera.focalLength + sphereCamera.position.position.y, sphereCamera.position.position.z), C3D(sphereCamera.position.position.x + mousePosition.x - canvas.width/2, sphereCamera.position.position.y, sphereCamera.position.position.z + canvas.height/2 - mousePosition.y), 0, 10, 0, 0, 0, 0).position.z]
-    sphereLight.move(-(spherePosition[0] - newPos[0]), 0, -(spherePosition[1] - newPos[1]))
-    spherePosition = newPos
+    // newPos = [planeLineIntersect(C3D(sphereCamera.position.position.x, -sphereCamera.focalLength + sphereCamera.position.position.y, sphereCamera.position.position.z), C3D(sphereCamera.position.position.x + mousePosition.x - canvas.width/2, sphereCamera.position.position.y, sphereCamera.position.position.z + canvas.height/2 - mousePosition.y), 0, 10, 0, 0, 0, 0).position.x, planeLineIntersect(C3D(sphereCamera.position.position.x, -sphereCamera.focalLength + sphereCamera.position.position.y, sphereCamera.position.position.z), C3D(sphereCamera.position.position.x + mousePosition.x - canvas.width/2, sphereCamera.position.position.y, sphereCamera.position.position.z + canvas.height/2 - mousePosition.y), 0, 10, 0, 0, 0, 0).position.z]
+    // sphereLight.move(-(spherePosition[0] - newPos[0]), 0, -(spherePosition[1] - newPos[1]))
+    // spherePosition = newPos
 
     lightOrbit += 0.02
 }
