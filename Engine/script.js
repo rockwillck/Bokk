@@ -419,7 +419,7 @@ function findIntersection(point1, point2, infinitive, planeX, planeY, planeZ, pl
 }
 
 var orbitRadius = 50
-var sphereCamera = new Camera(0, 10, 0, 0, 0, 0, 100)
+var sphereCamera = new Camera(0, 15, 0, 0, 0, 0, 100)
 var sphereLight = new Light("omni", 1, new Cartesian3D(0, 0, 0))
 pointerSphere = generateSphere(C3D(0, 17, 0), 15, 20, 20, "red")
 // plane = new Prop([])
@@ -428,11 +428,11 @@ pointerSphere = generateSphere(C3D(0, 17, 0), 15, 20, 20, "red")
 //         plane.speckles.push(F([C3D(x, 20, y), C3D(x+4, 20, y), C3D(x+4, 20, y+4), C3D(x, 20, y+4)], "white"))
 //     }
 // }
-var sphereScene = new Scene([generateCube(0, 0, 0, 50, 50, 50)], sphereCamera, [sphereLight])
+var sphereScene = new Scene([generateCube(-25, 70, -30, 50, 50, 0)], sphereCamera, [sphereLight])
 var velocity = [0, 0, 0, 0, 0, 0]
-var speed = 0.01
+var speed = 0.05
 var lightOrbit = 0
-var rotSpeed = 0.02
+var rotSpeed = 0.01
 var spherePosition = [0, 0]
 function runtime() {
     // clear screen
@@ -462,11 +462,17 @@ function runtime() {
 
     // sphereLight.position.move((Math.cos(lightOrbit) * orbitRadius - Math.cos(lightOrbit - 0.02) * orbitRadius)*dt/30, (Math.sin(lightOrbit) * orbitRadius - Math.sin(lightOrbit - 0.02) * orbitRadius)*dt/30, 0)
 
-    // sphereScene.props[1].move((Math.cos(lightOrbit) * orbitRadius - Math.cos(lightOrbit - 0.02) * orbitRadius)*dt/30, (Math.sin(lightOrbit) * orbitRadius - Math.sin(lightOrbit - 0.02) * orbitRadius)*dt/30, 0)
+    // // sphereScene.props[1].move((Math.cos(lightOrbit) * orbitRadius - Math.cos(lightOrbit - 0.02) * orbitRadius)*dt/30, (Math.sin(lightOrbit) * orbitRadius - Math.sin(lightOrbit - 0.02) * orbitRadius)*dt/30, 0)
     
     // newPos = [planeLineIntersect(C3D(sphereCamera.position.position.x, -sphereCamera.focalLength + sphereCamera.position.position.y, sphereCamera.position.position.z), C3D(sphereCamera.position.position.x + mousePosition.x - canvas.width/2, sphereCamera.position.position.y, sphereCamera.position.position.z + canvas.height/2 - mousePosition.y), 0, 10, 0, 0, 0, 0).position.x, planeLineIntersect(C3D(sphereCamera.position.position.x, -sphereCamera.focalLength + sphereCamera.position.position.y, sphereCamera.position.position.z), C3D(sphereCamera.position.position.x + mousePosition.x - canvas.width/2, sphereCamera.position.position.y, sphereCamera.position.position.z + canvas.height/2 - mousePosition.y), 0, 10, 0, 0, 0, 0).position.z]
     // sphereLight.move(-(spherePosition[0] - newPos[0]), 0, -(spherePosition[1] - newPos[1]))
     // spherePosition = newPos
+
+    point = planeLineIntersect(C3D(sphereCamera.position.position.x, -sphereCamera.focalLength + sphereCamera.position.position.y, sphereCamera.position.position.z), C3D(sphereCamera.position.position.x + mousePosition.x - canvas.width/2, sphereCamera.position.position.y, sphereCamera.position.position.z + canvas.height/2 - mousePosition.y), 0, 45, -30, Math.PI/2, 0, 0)
+    // console.log(point)
+    if (point.position.x > -25 && point.position.x < 25 && point.position.y > 20 && point.position.y < 70) {
+        // console.log("hi")
+    }
 
     lightOrbit += 0.02
 }
